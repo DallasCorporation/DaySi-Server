@@ -6,12 +6,19 @@ const Categories = require('../models/categoryModel')
 
 
 const createCategory = asyncHandler(async (req, res) => {
-    const { name, description, image } = req.body
-    if (!name || !description || !image) {
+    const { name, description, image, icon } = req.body
+    if (!name || !description || !image || !icon) {
         res.status(400)
         throw new Error('Please add all fields')
     }
-    res.status(201).json(res.data)
+    const category = await Categories.create({
+        name,
+        description,
+        image,
+        icon
+    })
+    if (category)
+        res.status(201).json(res.data)
 })
 const getCategories = asyncHandler(async (req, res) => {
     const goal = await Categories.find({})
