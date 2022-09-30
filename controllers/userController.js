@@ -71,7 +71,8 @@ const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
       password: user.password,
       token: generateToken(user._id),
-      type: user.type
+      type: user.type,
+      avatar: user.avatar
     })
   } else {
     res.status(400)
@@ -170,7 +171,7 @@ const deleteUserById = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error('User not found')
   }
-  
+
   await user.remove()
   res.status(200).json({ id: req.params.id })
 })
@@ -178,13 +179,34 @@ const deleteUserById = asyncHandler(async (req, res) => {
 const getAll = asyncHandler(async (req, res) => {
   const goal = await User.find({})
   if (goal)
-      res.status(200).json(goal)
+    res.status(200).json(goal)
   else {
-      res.status(400)
-      throw new Error('Organizations not found')
+    res.status(400)
+    throw new Error('Organizations not found')
   }
 })
 
+const updateAvatar = asyncHandler(async (req, res) => {
+  const { avatar } = req.body
+  const user = await User.findById(req.params.id)
+
+  if (!user) {
+    res.status(400)
+    throw new Error('User not found')
+  }
+
+  // Make sure the logged in user matches the goal user
+  if (user._id.toString() !== req.params.id) {
+    res.status(401)
+    throw new Error('User not authorized')
+  }
+  const updateUserAvatar = await User.findByIdAndUpdate(
+    req.params.id,
+    { avatar: avatar, }, {
+    new: true,
+  })
+  res.status(200).json(updateUserAvatar)
+})
 
 module.exports = {
   registerUser,
@@ -194,5 +216,6 @@ module.exports = {
   updateUserById,
   deleteUserById,
   updateUserPasswordById,
-  getAll
+  getAll,
+  updateAvatar
 }

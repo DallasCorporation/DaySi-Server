@@ -8,12 +8,14 @@ const {
   updateUserById,
   deleteUserById,
   updateUserPasswordById,
-  getAll
+  getAll,
+  updateAvatar
 } = require('../controllers/userController')
 const { protect } = require('../middleware/authMiddleware')
 
 router.post('/api/user/register', registerUser)
 router.post('/api/user/login', loginUser)
+router.put('/api/userAvatar/:id', updateAvatar)
 router.get('/api/user/me', protect, getMe)
 router.get('/api/user/all', getAll)
 router.get('/api/user/:id', getUserById )
