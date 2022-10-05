@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
-const Preference = require('../models/userPreferenceModel')
-const Organization = require('../models/organizationModel')
 const dbo = require("../db/conn");
 const ObjectId = require("mongodb").ObjectId;
 // @desc    Register new user
@@ -72,7 +70,8 @@ const loginUser = asyncHandler(async (req, res) => {
       password: user.password,
       token: generateToken(user._id),
       type: user.type,
-      avatar: user.avatar
+      avatar: user.avatar,
+      themeLight: user.themeLight
     })
   } else {
     res.status(400)
@@ -208,6 +207,29 @@ const updateAvatar = asyncHandler(async (req, res) => {
   res.status(200).json(updateUserAvatar)
 })
 
+
+const updateTheme = asyncHandler(async (req, res) => {
+  const { themeLight } = req.body
+  const user = await User.findById(req.params.id)
+
+  if (!user) {
+    res.status(400)
+    throw new Error('User not found')
+  }
+
+  // Make sure the logged in user matches the goal user
+  if (user._id.toString() !== req.params.id) {
+    res.status(401)
+    throw new Error('User not authorized')
+  }
+  const updateUserAvatar = await User.findByIdAndUpdate(
+    req.params.id,
+    { themeLight: themeLight, }, {
+    new: true,
+  })
+  res.status(200).json(updateUserAvatar)
+})
+
 module.exports = {
   registerUser,
   loginUser,
@@ -217,5 +239,6 @@ module.exports = {
   deleteUserById,
   updateUserPasswordById,
   getAll,
-  updateAvatar
+  updateAvatar,
+  updateTheme
 }

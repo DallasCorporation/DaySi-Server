@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
     type: {
         type: String,
     },
+    themeLight: {
+        type: Boolean,
+        default: true
+    },
     date: {
         type: Date,
         default: Date.now
